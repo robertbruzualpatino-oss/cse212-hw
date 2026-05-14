@@ -66,8 +66,9 @@
         if (_queue.Count <= 0)
             throw new IndexOutOfRangeException();
 
-        var value = _queue[1];
-        _queue.RemoveAt(1);
+        var targetIndex = _queue.Count - 1;
+        var value = _queue[targetIndex];
+        _queue.RemoveAt(targetIndex);
         return value;
     }
 }
