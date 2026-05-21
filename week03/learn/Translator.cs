@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Generic;
+
 public class Translator
 {
     public static void Run()
@@ -11,7 +14,7 @@ public class Translator
         Console.WriteLine(englishToGerman.Translate("Train")); // ???
     }
 
-    private Dictionary<string, string> _words = new();
+    private readonly Dictionary<string, string> _words = new Dictionary<string, string>();
 
     /// <summary>
     /// Add the translation from 'from_word' to 'to_word'
@@ -21,10 +24,14 @@ public class Translator
     /// </summary>
     /// <param name="fromWord">The word to translate from</param>
     /// <param name="toWord">The word to translate to</param>
-    /// <returns>fixed array of divisors</returns>
     public void AddWord(string fromWord, string toWord)
     {
-        // ADD YOUR CODE HERE
+        if (string.IsNullOrEmpty(fromWord) || string.IsNullOrEmpty(toWord))
+        {
+            throw new ArgumentException("Both fromWord and toWord must be non-empty strings.");
+        }
+
+        _words[fromWord] = toWord;
     }
 
     /// <summary>
@@ -34,7 +41,16 @@ public class Translator
     /// <returns>The translated word or "???" if no translation is available</returns>
     public string Translate(string fromWord)
     {
-        // ADD YOUR CODE HERE
-        return "";
+        if (string.IsNullOrEmpty(fromWord))
+        {
+            return "???";
+        }
+
+        if (_words.ContainsKey(fromWord))
+        {
+            return _words[fromWord];
+        }
+
+        return "???";
     }
 }
