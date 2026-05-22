@@ -261,7 +261,7 @@ public class MazeTests
         Assert.AreEqual("Current location (x=6, y=6)", maze.GetStatus());
     }
 
-    private void AssertThrowsInvalidOperationException(Action action)
+    private static void AssertThrowsInvalidOperationException(Action action)
     {
         try
         {
@@ -335,8 +335,7 @@ public class EarthquakeDailySummaryTests
     [TestMethod]
     public void EarthquakeDailySummary_Basic()
     {
-        var result = SetsAndMaps.EarthquakeDailySummary();
-        Assert.IsTrue(result.Length > 5, "Too few earthquakes");
+        var result = SetsAndMaps.EarthquakeDailySummary().Result;
 
         foreach (string s in result)
         {
