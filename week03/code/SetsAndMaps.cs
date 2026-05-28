@@ -17,7 +17,9 @@ public static class SetsAndMaps
 
         foreach (var word in words)
         {
-            string reversed = $"{word[1]}{word[0]}";
+            char[] charArray = word.ToCharArray();
+            Array.Reverse(charArray);
+            string reversed = new string(charArray);
 
             if (seen.Contains(reversed))
             {
@@ -82,7 +84,7 @@ public static class SetsAndMaps
 
     public static async Task<string[]> EarthquakeDailySummary()
     {
-        const string uri = "https://usgs.gov";
+        const string uri = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/significant_day.geojson";
         using var client = new HttpClient();
 
         client.Timeout = TimeSpan.FromSeconds(5);
@@ -92,9 +94,12 @@ public static class SetsAndMaps
         {
             string jsonString = await client.GetStringAsync(uri);
 
-            var serializer = new DataContractJsonSerializer(typeof(FeatureCollection));
-            using var stream = new MemoryStream(Encoding.UTF8.GetBytes(jsonString));
-            var featureCollection = (FeatureCollection?)serializer.ReadObject(stream);
+            var options = new System.Text.Json.JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            };
+
+            var featureCollection = System.Text.Json.JsonSerializer.Deserialize<FeatureCollection>(jsonString, options);
 
             var summary = new List<string>();
             if (featureCollection?.Features != null)
@@ -102,7 +107,7 @@ public static class SetsAndMaps
                 foreach (var feature in featureCollection.Features)
                 {
                     var props = feature.Properties;
-                    var magnitude = props.Mag.HasValue ? props.Mag.Value.ToString() : "N/A";
+                    var magnitude = props.Mag.HasValue ? props.Mag.Value.ToString("0.##") : "N/A";
                     summary.Add($"{props.Place} - Mag {magnitude}");
                 }
             }
@@ -120,27 +125,19 @@ public static class SetsAndMaps
         }
     }
 
-    [DataContract]
     public class FeatureCollection
     {
-        [DataMember(Name = "features")]
         public List<Feature> Features { get; set; } = new();
     }
 
-    [DataContract]
     public class Feature
     {
-        [DataMember(Name = "properties")]
         public EarthquakeProperties Properties { get; set; } = new();
     }
 
-    [DataContract]
     public class EarthquakeProperties
     {
-        [DataMember(Name = "place")]
         public string Place { get; set; } = string.Empty;
-
-        [DataMember(Name = "mag")]
         public double? Mag { get; set; }
     }
 }
